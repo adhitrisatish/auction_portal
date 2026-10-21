@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<input type="text" id="searchBox" placeholder="Search items..." class="search-bar">
+<h2>Available Items</h2>
+
+{% for item in items %}
+  <div class="item-card" style="border:1px solid black; padding:10px; margin:10px;">
+    <h3>{{ item.name }}</h3>
+    <p>{{ item.description }}</p>
+    <p>Base Price: ₹{{ item.base_price }}</p>
+
+    {% if item.winner == user %}
+      <p><b>You won this auction!</b></p>
+    {% elif item.winner %}
+      <p><b>Winner:</b> {{ item.winner.username }}</p>
+    {% endif %}
+
+    <a href="{% url 'bid' item.id %}">Place Bid</a>
+  </div>
+{% endfor %}
+
+{% endblock %}

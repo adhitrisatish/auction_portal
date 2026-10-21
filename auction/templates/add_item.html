@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Add Item</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <input name="name" placeholder="Item name"><br><br>
+    <textarea name="description" placeholder="Description"></textarea><br><br>
+    <input name="price" placeholder="Base Price"><br><br>
+
+    <label>Start Time:</label>
+    <input type="datetime-local" name="start"><br><br>
+
+    <label>End Time:</label>
+    <input type="datetime-local" name="end"><br><br>
+
+    <button type="submit">Add Item</button>
+</form>
+
+{% endblock %}

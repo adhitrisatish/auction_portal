@@ -1,0 +1,46 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Auction Portal</title>
+    
+</head>
+<body>
+
+<nav>
+    <div>
+        <a href="#">Auction Portal</a>
+    </div>
+
+    <div>
+        {% if user.is_authenticated %}
+
+            {% if user.profile.role == 'buyer' %}
+                <a href="{% url 'buyer' %}">Buyer</a>
+                <a href="{% url 'items' %}">Items</a>
+
+            {% elif user.profile.role == 'seller' %}
+                <a href="{% url 'seller' %}">Seller</a>
+                <a href="{% url 'add_item' %}">Add Item</a>
+
+            {% elif user.profile.role == 'auctioneer' %}
+                <a href="{% url 'auctioneer' %}">Auctioneer</a>
+            {% endif %}
+
+            <a href="{% url 'logout' %}">Logout</a>
+
+        {% else %}
+            <a href="{% url 'login' %}">Login</a>
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+<script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

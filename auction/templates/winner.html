@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Winner</h2>
+
+{% if winner %}
+  <p>{{ winner.buyer.username }} won with ₹{{ winner.amount }}</p>
+{% else %}
+  <p>No bids placed</p>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+<div class="container">
+ 
+    <h2>Seller Dashboard</h2>
+ 
+    <a href="{% url 'add_item' %}" class="btn">Add New Item</a>
+ 
+    <br><br>
+ 
+    <div class="grid">
+        {% for data in item_data %}
+<div class="card">
+ 
+            <h3>{{ data.item.name }}</h3>
+<p><b>Status:</b> {{ data.item.status }}</p>
+ 
+            {% if data.item.winner %}
+<p class="alert success">
+                    Winner: {{ data.item.winner.username }}
+</p>
+            {% endif %}
+ 
+            <h4>Bids</h4>
+ 
+            {% if data.bids %}
+                {% for bid in data.bids %}
+<div class="bid-row">
+                        {{ bid.buyer.username }} - ₹{{ bid.amount }}
+</div>
+                {% endfor %}
+            {% else %}
+<p class="small">No bids yet</p>
+            {% endif %}
+ 
+        </div>
+        {% endfor %}
+</div>
+ 
+</div>
+{% endblock %}

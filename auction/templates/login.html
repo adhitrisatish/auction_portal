@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="brand-title">AuctionHub</div>
+<h1>Welcome back! Please enter details to continue</h1>
+<h1>Login</h1>
+
+
+<form method="POST">
+    {% csrf_token %}
+    
+    <input name="username" placeholder="Username"><br><br>
+    <input name="password" type="password" placeholder="Password"><br><br>
+
+    <button type="submit">Login</button>
+</form>
+
+{% endblock %}

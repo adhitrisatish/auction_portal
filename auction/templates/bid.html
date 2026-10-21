@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+    <h2>Place Bid for {{ item.name }}</h2>
+
+    {% if highest_bid %}
+        <p><b>Current Highest Bid:</b> ₹{{ highest_bid.amount }}</p>
+    {% else %}
+        <p><b>No bids yet</b></p>
+    {% endif %}
+
+    {% if message %}
+        <div class="alert">{{ message }}</div>
+    {% endif %}
+
+    <p>Base Price: ₹{{ item.base_price }}</p>
+
+    <p><b>Start:</b> {{ item.start_time }}</p>
+    <p><b>End:</b> {{ item.end_time }}</p>
+
+    <p>Auction Ends In: <span id="timer"></span></p>
+    <p id="end-time" style="display:none;">{{ item.end_time|date:'Y-m-d H:i:s' }}</p>
+
+    <form method="POST" onsubmit="return validateBid()">
+        {% csrf_token %}
+        <input name="amount" id="amount" placeholder="Enter your bid">
+        <p id="bidError" style="color:red; font-size:14px;"></p>
+        <button class="btn">Submit Bid</button>
+    </form>
+
+    <h3>Bid History</h3>
+
+    {% if bids %}
+        {% for bid in bids %}
+            <p>{{ bid.buyer.username }} - ₹{{ bid.amount }}</p>
+        {% endfor %}
+    {% else %}
+        <p>No bids yet</p>
+    {% endif %}
+</div>
+
+{% endblock %}
