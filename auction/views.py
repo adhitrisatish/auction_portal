@@ -6,6 +6,7 @@ from .models import Profile
 from .models import Item, Bid
 from django.utils import timezone
 from django.contrib.auth import logout
+from notifications.models import Notification
 
 
 def register(request):
@@ -47,8 +48,24 @@ def user_login(request):
 
     return render(request, 'login.html')
 
+
+from notifications.models import Notification
+
 def buyer_dashboard(request):
-    return render(request, 'buyer.html')
+    notifications = Notification.objects.filter(
+        recipient=request.user
+    ).order_by("-created_at")[:5]
+
+    unread_count = Notification.objects.filter(
+        recipient=request.user,
+        is_read=False
+    ).count()
+
+    return render(request, 'buyer.html', {
+        'notifications': notifications,
+        'unread_count': unread_count
+    })
+
 
 def seller_dashboard(request):
     items = Item.objects.filter(seller=request.user)
@@ -87,6 +104,7 @@ def buyer_items(request):
     items = Item.objects.all()
     return render(request, 'buyer_items.html', {'items': items})
 
+
 def place_bid(request, item_id):
     item = Item.objects.get(id=item_id)
     message = ""
@@ -98,22 +116,46 @@ def place_bid(request, item_id):
 
         if now < item.start_time:
             message = "Auction has not started yet!"
+
         elif now > item.end_time:
             message = "Auction has ended!"
+
         else:
-            # existing bidding logic here
-            highest_bid = Bid.objects.filter(item=item).order_by('-amount').first()
+            # Find the current highest bid before saving the new one
+            highest_bid = Bid.objects.filter(
+                item=item
+            ).order_by('-amount', '-timestamp').first()
 
             if highest_bid:
                 if amount > highest_bid.amount:
+
+                    # Save the new valid bid
                     Bid.objects.create(
                         item=item,
                         buyer=request.user,
                         amount=amount
                     )
+
+                    # Notify the previous highest bidder,
+                    # but do not notify the same buyer
+                    if highest_bid.buyer != request.user:
+                        Notification.objects.create(
+                            recipient=highest_bid.buyer,
+                            message=(
+                                f"You have been outbid on "
+                                f"{item.name}! The new bid is "
+                                f"₹{amount:.2f}."
+                            ),
+                            notification_type="outbid"
+                        )
+
                     message = "Bid placed successfully!"
+
                 else:
-                    message = "Bid must be higher than current highest bid!"
+                    message = (
+                        "Bid must be higher than current highest bid!"
+                    )
+
             else:
                 if amount >= item.base_price:
                     Bid.objects.create(
@@ -121,12 +163,19 @@ def place_bid(request, item_id):
                         buyer=request.user,
                         amount=amount
                     )
+
                     message = "Bid placed successfully!"
+
                 else:
                     message = "Bid must be at least the base price!"
 
-    highest_bid = Bid.objects.filter(item_id=item_id).order_by('-amount').first()
-    bids = Bid.objects.filter(item_id=item_id).order_by('-amount')
+    highest_bid = Bid.objects.filter(
+        item_id=item_id
+    ).order_by('-amount', '-timestamp').first()
+
+    bids = Bid.objects.filter(
+        item_id=item_id
+    ).order_by('-amount', '-timestamp')
 
     return render(request, 'bid.html', {
         'item': item,
@@ -134,6 +183,7 @@ def place_bid(request, item_id):
         'highest_bid': highest_bid,
         'bids': bids
     })
+
 
 def auctioneer_dashboard(request):
     items = Item.objects.all()

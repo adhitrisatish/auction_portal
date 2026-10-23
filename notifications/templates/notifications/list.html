@@ -1,0 +1,129 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Notifications | Auction Portal</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6fb;
+            color: #222;
+        }
+
+        .header {
+            background: #202b46;
+            color: white;
+            padding: 22px 8%;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: 35px auto;
+            padding: 0 20px;
+        }
+
+        .notification {
+            background: white;
+            padding: 20px;
+            margin-bottom: 14px;
+            border-radius: 10px;
+            border-left: 5px solid #4169e1;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+        }
+
+        .unread {
+            background: #edf3ff;
+        }
+
+        .message {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .meta {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .read-button {
+            margin-top: 12px;
+            padding: 9px 14px;
+            background: #202b46;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .empty {
+            background: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #3158b7;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>My Notifications</h1>
+        <p>Stay updated on your auction activity.</p>
+    </div>
+
+    <div class="container">
+        <a class="back" href="/buyer/">&larr; Back to Dashboard</a>
+
+        {% if notifications %}
+            {% for notification in notifications %}
+                <div class="notification {% if not notification.is_read %}unread{% endif %}">
+                    <div class="message">
+                        {% if notification.notification_type == "outbid" %}
+                            <strong>Outbid Alert</strong>
+                        {% else %}
+                            <strong>Auction Update</strong>
+                        {% endif %}
+                    </div>
+
+                    <p>{{ notification.message }}</p>
+
+                    <div class="meta">
+                        {{ notification.created_at|date:"d M Y, h:i A" }}
+
+                        {% if notification.is_read %}
+                            · Read
+                        {% else %}
+                            · Unread
+                        {% endif %}
+                    </div>
+
+                    {% if not notification.is_read %}
+                        <form method="POST"
+                              action="{% url 'notifications:mark_as_read' notification.id %}">
+                            {% csrf_token %}
+                            <button class="read-button" type="submit">
+                                Mark as Read
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty">
+                <h3>You're all caught up!</h3>
+                <p>You don't have any notifications yet.</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

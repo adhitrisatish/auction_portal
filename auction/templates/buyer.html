@@ -1,45 +1,299 @@
+
 {% extends 'base.html' %}
- 
+
 {% block content %}
-<div class="container">
- 
-    <h2>Available Items</h2>
- 
-    <div class="grid">
 
-        {% for item in items %}
-        <div class="card">
- 
-            <h3>{{ item.name }}</h3>
-            <p>{{ item.description }}</p>
- 
-            <p><b>Base Price:</b> ₹{{ item.base_price }}</p>
- 
-            {% if item.winner == user %}
-            <div class="alert success">
+<style>
+    /* Main buyer dashboard */
+    .buyer-dashboard {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 25px 20px;
+    }
 
-                    You won this auction!
-            </div>
- 
-            {% elif item.winner %}
-            <p class="small">
+    /* Notifications section */
+    .notifications-section {
+        background: #f4f6fb;
+        padding: 24px;
+        margin-bottom: 35px;
+        border-radius: 14px;
+        border: 1px solid #e1e6f0;
+    }
 
-                    Winner: {{ item.winner.username }}
-            </p>
+    .notifications-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
 
+    .notifications-heading h2 {
+        margin: 0;
+        color: #202b46;
+    }
+
+    .notification-badge {
+        display: inline-block;
+        background: #dc3545;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        vertical-align: middle;
+    }
+
+    .notification-card {
+        background: white;
+        padding: 18px 20px;
+        margin: 12px 0;
+        border-radius: 9px;
+        border-left: 5px solid #b8c2d6;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .notification-card.unread {
+        background: #eaf1ff;
+        border-left-color: #4169e1;
+    }
+
+    .notification-card strong {
+        color: #202b46;
+        font-size: 16px;
+    }
+
+    .notification-card p {
+        margin: 10px 0;
+        color: #333;
+        line-height: 1.5;
+    }
+
+    .notification-card small {
+        color: #687386;
+    }
+
+    .no-notifications {
+        background: white;
+        padding: 22px;
+        text-align: center;
+        border-radius: 9px;
+        color: #687386;
+    }
+
+    .view-all-notifications {
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 16px;
+        background: #202b46;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .view-all-notifications:hover {
+        background: #34466f;
+        color: white;
+    }
+    .mark-read-btn {
+    background: #202b46;
+    color: white;
+    border: none;
+    padding: 9px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 5px;
+}
+
+.mark-read-btn:hover {
+    background: #34466f;
+}
+
+    /* Available auction items */
+    .items-heading {
+        color: #202b46;
+        margin-bottom: 20px;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 22px;
+    }
+
+    .card {
+        background: white;
+        padding: 22px;
+        border-radius: 12px;
+        border: 1px solid #e1e6f0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+        overflow-wrap: anywhere;
+    }
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 7px 18px rgba(0, 0, 0, 0.09);
+    }
+
+    .card h3 {
+        color: #202b46;
+        margin-top: 0;
+    }
+
+    .card p {
+        line-height: 1.5;
+    }
+
+    .btn {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 10px 16px;
+        background: #4169e1;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: background 0.2s;
+    }
+
+    .btn:hover {
+        background: #3153bd;
+        color: white;
+    }
+
+    .alert.success {
+        background: #d8f3df;
+        color: #176b32;
+        border-radius: 6px;
+        padding: 10px;
+        margin: 12px 0;
+    }
+
+    .small {
+        font-size: 14px;
+        color: #687386;
+    }
+
+    /* Mobile layout */
+    @media (max-width: 600px) {
+        .buyer-dashboard {
+            padding: 15px 12px;
+        }
+
+        .notifications-section {
+            padding: 16px;
+        }
+
+        .card {
+            padding: 17px;
+        }
+    }
+</style>
+
+<div class="buyer-dashboard">
+
+    <!-- Notifications -->
+    <section class="notifications-section">
+
+        <div class="notifications-heading">
+            <h2>My Notifications</h2>
+
+            {% if unread_count > 0 %}
+                <span class="notification-badge">
+                    {{ unread_count }} unread
+                </span>
             {% endif %}
- 
-            <a href="{% url 'bid' item.id %}" class="btn">
-
-                Place Bid
-            </a>
- 
         </div>
 
+        {% for notification in notifications %}
+            <div class="notification-card {% if not notification.is_read %}unread{% endif %}">
+
+                <strong>
+                    {% if notification.notification_type == "outbid" %}
+                        Outbid Alert
+                    {% else %}
+                        Auction Update
+                    {% endif %}
+                </strong>
+
+                <p>{{ notification.message }}</p>
+
+                
+                <small>
+                        {{ notification.created_at|date:"d M Y, h:i A" }}
+                        · {% if notification.is_read %}Read{% else %}Unread{% endif %}
+                </small>
+
+                {% if not notification.is_read %}
+                    <form method="POST"
+                        action="{% url 'notifications:mark_as_read' notification.id %}"
+                        style="margin-top: 12px;">
+                    {% csrf_token %}
+                    <button type="submit" class="mark-read-btn">
+                        Mark as Read
+                    </button>
+                    </form>
+                {% endif %}
+
+
+            </div>
+
+        {% empty %}
+            <div class="no-notifications">
+                <p>You don't have any notifications yet.</p>
+            </div>
+        {% endfor %}
+
+        <a href="/notifications/" class="view-all-notifications">
+            View All Notifications
+        </a>
+
+    </section>
+
+    <!-- Available Items -->
+    <section class="items-section">
+
+        <h2 class="items-heading">Available Items</h2>
+
+        <div class="grid">
+
+            {% for item in items %}
+                <div class="card">
+
+                    <h3>{{ item.name }}</h3>
+
+                    <p>{{ item.description }}</p>
+
+                    <p>
+                        <strong>Base Price:</strong>
+                        ₹{{ item.base_price }}
+                    </p>
+
+                    {% if item.winner == user %}
+                        <div class="alert success">
+                            You won this auction!
+                        </div>
+
+                    {% elif item.winner %}
+                        <p class="small">
+                            Winner: {{ item.winner.username }}
+                        </p>
+                    {% endif %}
+
+                    <a href="{% url 'bid' item.id %}" class="btn">
+                        Place Bid
+                    </a>
+
+                </div>
+            {% empty %}
+                <p>No auction items are available right now.</p>
             {% endfor %}
-    </div>
- 
+
+        </div>
+
+    </section>
+
 </div>
 
 {% endblock %}
- 

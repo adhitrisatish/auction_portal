@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'auction',
+    'notifications'
 ]
 
 MIDDLEWARE = [
@@ -78,9 +79,9 @@ DATABASES = {
    'ENGINE': 'django.db.backends.mysql',
    'NAME': 'auction_db',
    'USER': 'root',
-   'PASSWORD': 'AS@190406',
-   'HOST': 'localhost',
-   'PORT': '3306',
+   'PASSWORD': 'jee2024_nm28',
+   'HOST': '127.0.0.1',
+   'PORT': '3307',
  }
 }
 
@@ -129,3 +130,4 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = '/login/'
