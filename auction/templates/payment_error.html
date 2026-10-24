@@ -1,0 +1,10 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Payment Notice</h1>
+    <p>{{ message }}</p>
+    <a href="{% url 'buyer' %}">Return to dashboard</a>
+</div>
+{% endblock %}

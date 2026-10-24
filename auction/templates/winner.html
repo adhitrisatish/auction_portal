@@ -5,6 +5,11 @@
 
 {% if winner %}
   <p>{{ winner.buyer.username }} won with ₹{{ winner.amount }}</p>
+  {% if item.winner == request.user %}
+    <a href="{% url 'payment_checkout' item.id %}">
+        Pay Now
+    </a>
+{% endif %}
 {% else %}
   <p>No bids placed</p>
 {% endif %}

@@ -1,0 +1,22 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    {% if payment.status == 'success' %}
+        <h1>Payment Successful!</h1>
+        <p>Your simulated payment has been recorded.</p>
+    {% else %}
+        <h1>Payment Failed</h1>
+        <p>The simulated transaction failed. You can return to checkout and try again.</p>
+    {% endif %}
+
+    <p><strong>Item:</strong> {{ item.name }}</p>
+    <p><strong>Amount:</strong> ₹{{ payment.amount }}</p>
+    <p><strong>Method:</strong> {{ payment.get_payment_method_display }}</p>
+    <p><strong>Transaction ID:</strong> {{ payment.transaction_id }}</p>
+    <p><strong>Status:</strong> {{ payment.get_status_display }}</p>
+
+    <a href="{% url 'buyer' %}">Return to dashboard</a>
+</div>
+{% endblock %}

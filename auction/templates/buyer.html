@@ -251,6 +251,36 @@
 
     </section>
 
+<div class="container">
+    <h2>My Won Auctions</h2>
+
+    <div class="grid">
+        {% for item in won_items %}
+            <div class="card">
+                <h3>{{ item.name }}</h3>
+
+                <p>
+                    Winning bid:
+                    <strong>
+                        {% with bid=item.bid_set.all|dictsortreversed:"amount"|first %}
+                            {% if bid %}
+                                ₹{{ bid.amount }}
+                            {% endif %}
+                        {% endwith %}
+                    </strong>
+                </p>
+
+                <a href="{% url 'payment_checkout' item.id %}"
+                   class="btn">
+                    Pay Now
+                </a>
+            </div>
+        {% empty %}
+            <p>You haven't won any auctions yet.</p>
+        {% endfor %}
+    </div>
+</div>
+
     <!-- Available Items -->
     <section class="items-section">
 

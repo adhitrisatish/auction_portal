@@ -15,5 +15,15 @@ urlpatterns = [
     path('approve/<int:item_id>/', views.approve_item, name='approve'),
     path('winner/<int:item_id>/', views.declare_winner, name='winner'),
     path('logout/', views.user_logout, name='logout'),
+    path(
+    'payment/<int:item_id>/',
+    views.payment_checkout,
+    name='payment_checkout'
+),
+path(
+    'payment/<int:item_id>/process/',
+    views.process_payment,
+    name='process_payment'
+),
 ]
 
